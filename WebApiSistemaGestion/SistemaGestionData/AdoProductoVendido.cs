@@ -4,25 +4,25 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApiSistemaGestion.Exceptions;
 using WebApiSistemaGestion.SistemaGestionEntities;
 
 namespace WebApiSistemaGestion.SistemaGestionData
 {
     public static class AdoProductoVendido
     {
-      
+       
 
         public static List<ProductoVendido> ListarProductoVendido()
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
+            try { 
+           
             List<ProductoVendido> lista = new List<ProductoVendido>();
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "SELECT Id, IdProducto, Stock, IdVenta FROM ProductoVendido";
                 SqlCommand command = new SqlCommand(query, connection);
 
-                connection.Open();
 
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -45,18 +45,25 @@ namespace WebApiSistemaGestion.SistemaGestionData
 
 
             }
+            }
+            catch (Exception ex)
+            {
+                throw new DataBaseException("Error al obtener todos los Productos Vendidos", ex);
+            }
+
         }
 
         public static ProductoVendido ObtenerProductoVendidoPorId(int id)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+            try
+            {
+                
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "SELECT * FROM ProductoVendido Where id = @id";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("id", id);
-                connection.Open();
+            
 
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -77,13 +84,17 @@ namespace WebApiSistemaGestion.SistemaGestionData
 
 
             }
+            }
+            catch (Exception ex)
+            {
+                throw new DataBaseException("Error al obtener producto vendido por id", ex);
+            }
         }
 
         public static bool AgregarProductoVendido(ProductoVendido productoVendido)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+            
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "INSERT INTO ProductoVendido (IdProducto, Stock, IdVenta) values" +
                     "(@idProducto, @stock, @idVenta)";
@@ -93,16 +104,14 @@ namespace WebApiSistemaGestion.SistemaGestionData
                 command.Parameters.AddWithValue("idProducto", productoVendido.IdProducto);
                 command.Parameters.AddWithValue("stock", productoVendido.Stock);
                 command.Parameters.AddWithValue("idVenta", productoVendido.IdVenta);
-                connection.Open();
+            
 
                 return command.ExecuteNonQuery() > 0;
             }
         }
         public static bool BorrarUnProductoVendidoPorid(int id)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "DELETE FROM ProductoVendido Where id= @id";
 
@@ -118,10 +127,8 @@ namespace WebApiSistemaGestion.SistemaGestionData
 
         public static bool ActualizarUnProductoVendidoPorId(int id, ProductoVendido productoVendido)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+           
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "UPDATE FROM ProductoVendido SET (IdProducto, Stock, IdVenta) values" +
                     "(@idProducto, @stock, @idVenta) where id= @id";
@@ -131,8 +138,6 @@ namespace WebApiSistemaGestion.SistemaGestionData
                 command.Parameters.AddWithValue("idProducto", productoVendido.IdProducto);
                 command.Parameters.AddWithValue("stock", productoVendido.Stock);
                 command.Parameters.AddWithValue("idVenta", productoVendido.IdVenta);
-
-                connection.Open();
 
                 return command.ExecuteNonQuery() > 0;
 

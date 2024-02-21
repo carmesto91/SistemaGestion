@@ -36,3 +36,4 @@ C:\Users\Hp\source\repos\SistemaGestion\WebApiSistemaGestion\obj\Debug\net6.0\re
 C:\Users\Hp\source\repos\SistemaGestion\WebApiSistemaGestion\obj\Debug\net6.0\WebApiSistemaGestion.pdb
 C:\Users\Hp\source\repos\SistemaGestion\WebApiSistemaGestion\obj\Debug\net6.0\WebApiSistemaGestion.genruntimeconfig.cache
 C:\Users\Hp\source\repos\SistemaGestion\WebApiSistemaGestion\obj\Debug\net6.0\ref\WebApiSistemaGestion.dll
+C:\Users\Hp\source\repos\SistemaGestion\WebApiSistemaGestion\obj\Debug\net6.0\WebApiSistemaGestion.sourcelink.json

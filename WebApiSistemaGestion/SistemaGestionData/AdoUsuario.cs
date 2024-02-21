@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using WebApiSistemaGestion.Exceptions;
 using WebApiSistemaGestion.SistemaGestionEntities;
 
 namespace WebApiSistemaGestion.SistemaGestionData
@@ -14,50 +15,59 @@ namespace WebApiSistemaGestion.SistemaGestionData
        
         public static List<Usuario> ListarUsuarios()
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-            List<Usuario> lista = new List<Usuario>();
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+            try
             {
-                string query = "SELECT Id, Nombre, Apellido, NombreUsuario, Contraseña, Mail FROM Usuario";
-                SqlCommand command = new SqlCommand(query, connection);
                 
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.HasRows)
+                List<Usuario> lista = new List<Usuario>();
+                using (SqlConnection connection = AdoConexion.GetConnection())
                 {
-                    while(reader.Read()) { 
-                    var usuario = new Usuario();
-                    usuario.Id = Convert.ToInt32(reader["Id"]);
-                    usuario.Nombre = reader.GetString(1);
-                    usuario.Apellido = reader.GetString(2);
-                    usuario.NombreUsuario = reader.GetString(3);
-                    usuario.Password = reader.GetString(4);
-                    usuario.Mail = reader.GetString(5);
-                    lista.Add(usuario);
-                    }
+                    string query = "SELECT Id, Nombre, Apellido, NombreUsuario, Contraseña, Mail FROM Usuario";
+                    SqlCommand command = new SqlCommand(query, connection);
 
+                   
+
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var usuario = new Usuario();
+                            usuario.Id = Convert.ToInt32(reader["Id"]);
+                            usuario.Nombre = reader.GetString(1);
+                            usuario.Apellido = reader.GetString(2);
+                            usuario.NombreUsuario = reader.GetString(3);
+                            usuario.Password = reader.GetString(4);
+                            usuario.Mail = reader.GetString(5);
+                            lista.Add(usuario);
+                        }
+
+
+                    }
+                    return lista;
 
                 }
-                return lista;
-
-
-
             }
-        }
+            catch (Exception ex)
+            {
+                throw new DataBaseException("Error al obtener todos los usuarios", ex);
+            }
+
+
+        
+    }
 
             public static Usuario ObtenerUsuarioPorId(int id)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+                try
+                {
+                   
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "SELECT * FROM Usuario Where id = @id";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("id", id);
-                connection.Open();
+              
 
                 SqlDataReader reader = command.ExecuteReader();
 
@@ -81,12 +91,17 @@ namespace WebApiSistemaGestion.SistemaGestionData
 
             }
         }
-
-        public static bool AgregarUsuario(Usuario usuario)
+        catch (Exception ex)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
+            throw new DataBaseException("Error al obtenene un usuario por id", ex);
+        }
 
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+    }
+
+    public static bool AgregarUsuario(Usuario usuario)
+        {
+          
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "INSERT INTO Usuario (Nombre, Apellido, NombreUsuario, Contraseña, Mail) values" +
                     "(@nombre, @apellido, @nombreUsuario, @password, @mail)";
@@ -98,23 +113,21 @@ namespace WebApiSistemaGestion.SistemaGestionData
                 command.Parameters.AddWithValue("nombreUsuario", usuario.NombreUsuario);
                 command.Parameters.AddWithValue("password", usuario.Password);
                 command.Parameters.AddWithValue("mail", usuario.Mail);
-                connection.Open();
+            
 
                 return command.ExecuteNonQuery() > 0;
             }
         }
         public static bool BorrarUnUsuarioPorid(int id)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+        
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "DELETE FROM Usuario Where id= @id";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("id", id);
-                connection.Open();
+                
 
                 return command.ExecuteNonQuery() >0;
 
@@ -124,9 +137,9 @@ namespace WebApiSistemaGestion.SistemaGestionData
         
         public static bool ActualizarUnUsuarioPorId(int id, Usuario usuario)
         {
-            string stringConnection = "Server=LAPTOP-KT3LRP0Q\\MSSQLSERVER01;Database=TodoHerramientas;Trusted_Connection=True;";
-
-            using (SqlConnection connection = new SqlConnection(stringConnection))
+   
+           
+            using (SqlConnection connection = AdoConexion.GetConnection())
             {
                 string query = "UPDATE FROM Usuario SET (Nombre, Apellido, NombreUsuario, Contraseña, Mail) values" +
                     "(@nombre, @apellido, @nombreUsuario, @password, @mail) where id= @id";
@@ -139,7 +152,7 @@ namespace WebApiSistemaGestion.SistemaGestionData
                 command.Parameters.AddWithValue("password", usuario.Password);
                 command.Parameters.AddWithValue("mail", usuario.Mail);
 
-                connection.Open();
+              
 
                 return command.ExecuteNonQuery() > 0;
 
